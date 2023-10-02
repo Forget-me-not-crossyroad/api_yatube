@@ -8,15 +8,18 @@ from posts.models import Comment, Post
 
 
 class PostSerializer(serializers.ModelSerializer):
+    author = serializers.StringRelatedField(
+        read_only=True, default=serializers.CurrentUserDefault())
+    # group = serializers.PrimaryKeyRelatedField(read_only=True)
+
     # achievements = AchievementSerializer(many=True, required=False)
     # age = serializers.SerializerMethodField()
     # color = serializers.ChoiceField(choices=CHOICES)
 
     class Meta:
         model = Post
-        fields = '__all__'
-        # fields = ('id', 'name', 'color', 'birth_year', 'owner', 'achievements',
-        #           'age')
+        # fields = '__all__'
+        fields = ('id', 'text', 'pub_date', 'image', 'author', 'group')
 
     # def get_age(self, obj):
     #     return dt.datetime.now().year - obj.birth_year
@@ -61,7 +64,9 @@ class PostListSerializer(serializers.ModelSerializer):
 
 
 class CommentSerializer(serializers.ModelSerializer):
+    author = serializers.StringRelatedField(
+        read_only=True, default=serializers.CurrentUserDefault())
 
     class Meta:
         model = Comment
-        fields = ('__all__')
+        fields = ('id', 'text', 'created', 'author')
