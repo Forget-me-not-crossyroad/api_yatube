@@ -53,6 +53,16 @@ class GroupSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Group
+        fields = ('id', 'title', 'slug', 'description')
+
+
+class GroupRetrieveSerializer(serializers.ModelSerializer):
+    # achievements = AchievementSerializer(many=True, required=False)
+    # age = serializers.SerializerMethodField()
+    # color = serializers.ChoiceField(choices=CHOICES)
+
+    class Meta:
+        model = Group
         fields = '__all__'
 
 
@@ -66,7 +76,11 @@ class PostListSerializer(serializers.ModelSerializer):
 class CommentSerializer(serializers.ModelSerializer):
     author = serializers.StringRelatedField(
         read_only=True, default=serializers.CurrentUserDefault())
+    post = serializers.SerializerMethodField()
 
     class Meta:
         model = Comment
-        fields = ('id', 'text', 'created', 'author')
+        fields = ('id', 'text', 'created', 'author', 'post')
+
+    def get_post(self, obj):
+        return obj.post.id
