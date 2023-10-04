@@ -1,11 +1,11 @@
 import os
-from django.conf import settings
-from django.shortcuts import get_object_or_404
-from rest_framework import viewsets
-from api.serializers import CommentSerializer, GroupSerializer, PostSerializer, PostListSerializer
 
-from posts.models import Comment, Post, Group
+from api.serializers import CommentSerializer, GroupSerializer, PostSerializer
+from django.conf import settings
 from django.core.exceptions import PermissionDenied
+from django.shortcuts import get_object_or_404
+from posts.models import Group, Post
+from rest_framework import viewsets
 
 
 class PostViewSet(viewsets.ModelViewSet):
@@ -28,52 +28,10 @@ class PostViewSet(viewsets.ModelViewSet):
             os.remove(filepath)
         instance.delete()
 
-    # def perform_destroy(self, serializer):
-    #     if serializer.instance.author != self.request.user:
-    #         raise PermissionDenied('Изменение чужого контента запрещено!')
-    #     super(PostViewSet, self).perform_destroy(serializer)
-    # Пишем метод, а в декораторе разрешим работу со списком объектов
-    # и переопределим URL на более презентабельный
-    # @action(detail=False, url_path='recent-white-cats')
-    # def recent_white_cats(self, request):
-    #     # Нужны только последние пять котиков белого цвета
-    #     cats = Cat.objects.filter(color='White')[:5]
-    #     # Передадим queryset cats сериализатору 
-    #     # и разрешим работу со списком объектов
-    #     serializer = self.get_serializer(cats, many=True)
-    #     return Response(serializer.data)
 
-    # def get_serializer_class(self):
-    #     # Если запрошенное действие (action) — получение списка объектов ('list')
-    #     if self.action == 'list':
-    #         # ...то применяем CatListSerializer
-    #         return PostListSerializer
-    #     # А если запрошенное действие — не 'list', применяем CatSerializer
-    #     return PostSerializer
-
-
-class GroupViewSet(viewsets.ModelViewSet):
+class GroupViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Group.objects.all()
     serializer_class = GroupSerializer
-
-    def perform_create(self, serializer):
-        post = get_object_or_404(Post, id=self.kwargs.get("post_id"))
-        serializer.save(post=post)
-
-    def perform_update(self, serializer):
-        if serializer.instance.author != self.request.user:
-            raise PermissionDenied('Изменение чужого контента запрещено!')
-        super(PostViewSet, self).perform_update(serializer)
-
-    def perform_destroy(self, instance):
-        if instance.author != self.request.user:
-            raise PermissionDenied('Изменение чужого контента запрещено!')
-        instance.delete()
-
-    # def get_serializer_class(self):
-    #     if self.action == 'retrieve':
-    #         return PostListSerializer
-    #     return GroupSerializer
 
 
 class CommentViewSet(viewsets.ModelViewSet):
@@ -82,7 +40,7 @@ class CommentViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         post = get_object_or_404(Post, id=self.kwargs.get("post_id"))
         return post.comments.all()
-    
+
     def perform_create(self, serializer):
         post = get_object_or_404(Post, id=self.kwargs.get("post_id"))
         serializer.save(author=self.request.user, post=post)
