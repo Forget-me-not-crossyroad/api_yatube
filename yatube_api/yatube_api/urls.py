@@ -3,7 +3,9 @@ from django.conf.urls.static import static
 from django.urls import include, path
 
 urlpatterns = [
-    path('api/', include('api.urls')),
+    path(
+        'api/', include('api.urls')
+    ),  # Первая часть префикса для всех эндпоинтов
 ]
 
 

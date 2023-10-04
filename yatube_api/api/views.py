@@ -9,6 +9,7 @@ from rest_framework import viewsets
 
 
 class PostViewSet(viewsets.ModelViewSet):
+    """ViewSet для модели Post."""
     queryset = Post.objects.all()
     serializer_class = PostSerializer
 
@@ -30,11 +31,13 @@ class PostViewSet(viewsets.ModelViewSet):
 
 
 class GroupViewSet(viewsets.ReadOnlyModelViewSet):
+    """ViewSet для модели Group."""
     queryset = Group.objects.all()
     serializer_class = GroupSerializer
 
 
 class CommentViewSet(viewsets.ModelViewSet):
+    """ViewSet для модели Comment."""
     serializer_class = CommentSerializer
 
     def get_queryset(self):
