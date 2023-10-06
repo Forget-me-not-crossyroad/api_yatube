@@ -1,17 +1,21 @@
 import os
 
-from api.serializers import CommentSerializer, GroupSerializer, PostSerializer
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import get_object_or_404
-from posts.models import Group, Post
+from rest_framework import permissions
 from rest_framework import viewsets
+
+from api.serializers import CommentSerializer, GroupSerializer, PostSerializer
+from posts.models import Group, Post
 
 
 class PostViewSet(viewsets.ModelViewSet):
     """ViewSet для модели Post."""
+
     queryset = Post.objects.all()
     serializer_class = PostSerializer
+    permission_classes = (permissions.IsAuthenticated,)
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
@@ -32,13 +36,17 @@ class PostViewSet(viewsets.ModelViewSet):
 
 class GroupViewSet(viewsets.ReadOnlyModelViewSet):
     """ViewSet для модели Group."""
+
     queryset = Group.objects.all()
     serializer_class = GroupSerializer
+    permission_classes = (permissions.IsAuthenticated,)
 
 
 class CommentViewSet(viewsets.ModelViewSet):
     """ViewSet для модели Comment."""
+
     serializer_class = CommentSerializer
+    permission_classes = (permissions.IsAuthenticated,)
 
     def get_queryset(self):
         post = get_object_or_404(Post, id=self.kwargs.get("post_id"))
